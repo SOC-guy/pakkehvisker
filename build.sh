@@ -1,4 +1,4 @@
 #!/bin/sh
-
+set -eu
 rm -rf build dist
-python setup.py bdist_wheel
+python3 -m pip wheel . --no-deps --wheel-dir dist

@@ -1,5 +1,5 @@
 import streamlit as st
-from pkg_resources import resource_filename
+from copy import deepcopy
 import os
 
 DEFAULT_SYSTEM_MESSAGE = """
@@ -77,7 +77,7 @@ default_settings = {
 
 def returnValue(key):
     if key not in st.session_state:
-        st.session_state[key] = default_settings[key]
+        st.session_state[key] = deepcopy(default_settings[key])
     return st.session_state[key]
 
 def getLpwPath(dirname):

@@ -65,4 +65,4 @@ with st.expander(label="**NGAP Agent Settings** ⚠️Experimental⚠️", expan
     st.session_state['agent_config_file'] = st.file_uploader(label='Agent Config YAML', type='yaml', label_visibility="hidden")
 
 def loadDefaultSettings():
-    st.session_state['selected_model'] = st.selectbox('Models', placeholder="Choose an Option", options=getModelList(),label_visibility='hidden')
+    st.session_state['selected_model'] = st.selectbox('Models', placeholder="Choose an Option", options=getModelList()[0],label_visibility='hidden')

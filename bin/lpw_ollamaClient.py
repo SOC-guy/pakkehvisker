@@ -1,7 +1,6 @@
 import streamlit as st
 import ollama
 from ollama import Client
-from typing import List
 
 class OllamaClient():
 
@@ -75,7 +74,7 @@ class OllamaClient():
             st.stop()
         return stream
     
-    def getModelList(self) -> List[str] | bool:
+    def getModelList(self) -> tuple[list[str], bool]:
         retList = []
         is_Connected = False
         try:

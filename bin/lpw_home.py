@@ -152,12 +152,10 @@ with st.sidebar:
     if packetFile:
         st.session_state['pcap_fname'] = packetFile.name
         with st.spinner('#### Crunching the packets... 🥣🥣🥣'):
-            with open(f'{packetFile.name}', 'wb') as f:
-                f.write(packetFile.read())
             filters, decodes = getFiltersAndDecodeInfo()
             st.session_state['pcap_filters'] = filters
             # print(f'#### {st.session_state['pcap_filters']}')
-            st.session_state['pcap_data'] = getPcapData(input_file=f'{packetFile.name}', filter=filters, decode_info=decodes)
+            st.session_state['pcap_data'] = getPcapData(input_file=packetFile.getvalue(), filter=filters, decode_info=decodes)
             initLLM(pcap_data=returnValue('pcap_data'))
             #os.remove(f'{packetFile.name}')
     else:

@@ -1,9 +1,6 @@
 import streamlit as st
 from lpw_ollamaClient import OllamaClient
-from typing import List
 from lpw_init import returnValue
-from lpw_prompt import *
-from lpw_packet import *
 
 def returnSystemText(pcap_data : str) -> str:
     PACKET_WHISPERER = f"""
@@ -12,25 +9,28 @@ def returnSystemText(pcap_data : str) -> str:
     """
     return PACKET_WHISPERER
 
-oClient = OllamaClient()
+def _getClient():
+    if 'ollama_client' not in st.session_state:
+        st.session_state['ollama_client'] = OllamaClient()
+    return st.session_state['ollama_client']
 
 def setLLMServer(server, port):
-    oClient.setServer(server, port)
+    _getClient().setServer(server, port)
 
 def initLLM(pcap_data) -> None:
-    oClient.set_system_message(system_message=returnSystemText(pcap_data))
+    _getClient().set_system_message(system_message=returnSystemText(pcap_data))
 
 def exitLLM() -> None:
-    oClient.set_system_message(system_message=returnValue('system_message'))
+    _getClient().set_system_message(system_message=returnValue('system_message'))
 
-def getModelList() -> List[str]:
-    return oClient.getModelList()
+def getModelList() -> tuple[list[str], bool]:
+    return _getClient().getModelList()
 
 def chatWithModel(prompt:str, model: str):
-    return oClient.chat(prompt=prompt, model=model, temp=0.4)
+    return _getClient().chat(prompt=prompt, model=model, temp=0.4)
 
 def clearHistory():
-    oClient.clear_history()
+    _getClient().clear_history()
 
 def modifySM(new_sm: str) -> None:
-    oClient.edit_system_message(new_sm)
+    _getClient().edit_system_message(new_sm)

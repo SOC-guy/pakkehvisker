@@ -99,8 +99,25 @@ streamlit run bin/lpw_main.py
 or simply
 
 ```
-<lpw dir>/bin/lpw {start or stop}
+<lpw dir>/bin/lpw start
 ```
+
+### WSL and Remote Access
+
+Run LPW inside a WSL distribution. Install the system prerequisites, then from the repository root create a virtual environment, install the project, and start Streamlit without opening a browser:
+
+```sh
+sudo apt update
+sudo apt install python3 python3-venv python3-pip tshark
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install .
+lpw start --host 0.0.0.0 --port 8501
+```
+
+Open `http://<WSL-host-or-IP>:8501` from the browser host. WSL2 localhost forwarding usually allows access from Windows on the same machine; access from other LAN hosts may require WSL/Windows firewall rules or port forwarding. The GUI has no built-in authentication, so do not expose this port to an untrusted network. Use `lpw stop` to stop the server.
+
+To build a wheel in WSL, run `./build.sh` from an activated Python virtual environment.
 
 ## Contributions
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import subprocess
-from pathlib import Path
 import os
 import signal
 import sys
@@ -33,18 +32,25 @@ def signint_handler(sig, frame):
     stop_lpw()
     print('Stopped...')
 
-cmd = ['streamlit', 'run', f'{current_script_dir}/lpw_main.py']
-
 parser = argparse.ArgumentParser()
 parser.add_argument("action", choices=["start", "stop"], help="Specify 'start' or 'stop'.")
+parser.add_argument("--host", default="0.0.0.0", help="Address for Streamlit to listen on (default: all interfaces).")
+parser.add_argument("--port", type=int, default=8501, help="Port for the Streamlit server (default: 8501).")
 args = parser.parse_args()
 signal.signal(signal.SIGINT, signint_handler)
 
 if args.action == 'start':
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    cmd = [
+        'streamlit', 'run', f'{current_script_dir}/lpw_main.py',
+        '--server.address', args.host,
+        '--server.port', str(args.port),
+        '--server.headless', 'true',
+        '--browser.gatherUsageStats', 'false',
+    ]
+    process = subprocess.Popen(cmd)
     with open(f'{lpw_home_dir}/.lpw', 'w') as f:
         f.write(str(process.pid))
-    print('LPW Started.. browse http://localhost:8501 and start whispering to LPW')
+    print(f'LPW listening on {args.host}:{args.port}. Connect from a browser using the server hostname or IP.')
     print('Instructions for stopping LPW :')
     print(STOPPING_INS)
     process.communicate()
