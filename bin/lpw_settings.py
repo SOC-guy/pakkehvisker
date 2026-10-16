@@ -18,6 +18,11 @@ with st.expander(label='**LLM Server Settings**', expanded=False, icon=":materia
     st.session_state['llm_server'] = st.text_input(label="LLM Server Host", value=returnValue('llm_server'))
     st.session_state['llm_server_port'] = st.number_input(label="LLM Server Host Port", value=returnValue('llm_server_port'), min_value=1024, max_value=65525, step=1)
     setLLMServer(st.session_state['llm_server'], st.session_state['llm_server_port'])
+    st.session_state['embedding_model'] = st.text_input(
+        label="Embedding Model",
+        value=returnValue('embedding_model'),
+        help="For example, nomic-embed-text. Run `ollama pull nomic-embed-text` before indexing captures.",
+    )
     st.session_state['selected_model'] = st.selectbox('**Available Models**', placeholder="Choose an Option", options=getModelList()[0])
 st.markdown('#### Select protocols to filter in analysis')
 col1, col2, col3 = st.columns(3)

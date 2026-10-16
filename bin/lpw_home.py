@@ -3,6 +3,7 @@ from lpw_init import *
 from lpw_prompt import *
 from lpw_packet import *
 from lpw_agent import CREWAI_AVAILABLE, LPWCrew
+from lpw_rag import format_context, index_capture, search_capture
 import os
 import time
 from streamlit_extras.tags import tagger_component
@@ -151,22 +152,50 @@ with st.sidebar:
     packetFile = st.file_uploader(label='Upload either a PCAP or PCAPNG file to chat', accept_multiple_files=False, type=['pcap','pcapng'])
     if packetFile:
         st.session_state['pcap_fname'] = packetFile.name
-        with st.spinner('#### Crunching the packets... 🥣🥣🥣'):
+        with st.spinner('#### Extracting, embedding, and indexing packets...'):
             filters, decodes = getFiltersAndDecodeInfo()
             st.session_state['pcap_filters'] = filters
-            # print(f'#### {st.session_state['pcap_filters']}')
-            st.session_state['pcap_data'] = getPcapData(input_file=packetFile.getvalue(), filter=filters, decode_info=decodes)
-            initLLM(pcap_data=returnValue('pcap_data'))
-            #os.remove(f'{packetFile.name}')
+            capture_bytes = packetFile.getvalue()
+            try:
+                index_stats = index_capture(
+                    packet_texts=extractPcapPackets(
+                        input_file=capture_bytes,
+                        filter=filters or "",
+                        decode_info=decodes,
+                    ),
+                    capture_bytes=capture_bytes,
+                    display_filter=filters or "",
+                    embedding_model=returnValue('embedding_model'),
+                    ollama_client=getOllamaClient(),
+                )
+            except ValueError as error:
+                st.error(str(error), icon='🚨')
+                st.stop()
+            except Exception as error:
+                log_message(f"Local PCAP indexing failed: {error}")
+                st.error(
+                    f"Could not build the local index. Check Ollama connectivity and confirm "
+                    f"the embedding model '{returnValue('embedding_model')}' is pulled. "
+                    f"Details: {error}",
+                    icon='🚨',
+                )
+                st.stop()
+            if index_stats['capture_id'] != returnValue('pcap_index_id'):
+                initLLM()
+            st.session_state['pcap_index_id'] = index_stats['capture_id']
+            st.session_state['pcap_index_stats'] = index_stats
+            st.session_state['pcap_data'] = ""
     else:
         st.session_state['pcap_fname'] = "None 🚫"
+        st.session_state['pcap_index_id'] = None
+        st.session_state['pcap_index_stats'] = {}
     if packetFile:
-        decoded_text = returnValue('pcap_data')
-        sent_chars = min(len(decoded_text), MAX_PCAP_CONTEXT_CHARS)
-        st.metric("Decoded packet text", f"{len(decoded_text):,} characters")
+        index_stats = returnValue('pcap_index_stats')
+        st.metric("Packets indexed", f"{index_stats.get('packet_count', 0):,}")
+        st.metric("Searchable chunks", f"{index_stats.get('chunk_count', 0):,}")
         st.caption(
-            f"Chat includes {sent_chars:,} of {len(decoded_text):,} characters "
-            f"(cap: {MAX_PCAP_CONTEXT_CHARS:,}; omitted: {len(decoded_text) - sent_chars:,})."
+            f"{index_stats.get('decoded_chars', 0):,} decoded characters · "
+            f"embeddings: {returnValue('embedding_model')}"
         )
 
 col1, col2 = st.columns([2,1])
@@ -207,7 +236,12 @@ else :
                     st.markdown(prompt)
                 with chat_container.chat_message(name='assistant', avatar=lpw_avatar):
                     with st.spinner('Processing....'):
-                        full_response = chatWithModel(prompt=prompt, model=returnValue('selected_model'))
+                        full_response = chatWithModel(
+                            prompt=prompt,
+                            model=returnValue('selected_model'),
+                            capture_id=returnValue('pcap_index_id'),
+                            embedding_model=returnValue('embedding_model'),
+                        )
                         returnValue('messages').append({'role' : 'assistant', 'content' : full_response})
                         if returnValue('streaming_enabled'):
                             message_placeholder = st.empty()
@@ -241,9 +275,18 @@ else :
             else:
                 if not returnValue('insights_file_done'):
                     with st.spinner('#### Generating Insights 🪄🪄🪄'):
-                        st.session_state['insights_raw'] = LPWCrew(llm_host=returnValue('llm_server'),
-                                llm_port=returnValue('llm_server_port'),
-                                model=returnValue('selected_model')).kickoff(returnValue('pcap_data'), returnValue('pcap_filters'))
+                        insight_matches = search_capture(
+                            capture_id=returnValue('pcap_index_id'),
+                            query="Summarize the capture's protocols, endpoints, conversations, anomalies, and notable events.",
+                            embedding_model=returnValue('embedding_model'),
+                            ollama_client=getOllamaClient(),
+                            top_k=12,
+                        )
+                        st.session_state['insights_raw'] = LPWCrew(
+                            llm_host=returnValue('llm_server'),
+                            llm_port=returnValue('llm_server_port'),
+                            model=returnValue('selected_model'),
+                        ).kickoff(format_context(insight_matches), returnValue('pcap_filters'))
                         st.session_state['insights_file_done'] = True
                         st.rerun()
                 else:

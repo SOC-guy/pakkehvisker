@@ -1,4 +1,5 @@
 crewai>=0.83.0; python_version < "3.14"
+chromadb>=0.5.20
 ollama>=0.4.2
 PyYAML>=6.0.2
 pyshark>=0.6

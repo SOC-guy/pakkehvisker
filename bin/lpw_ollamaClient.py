@@ -12,6 +12,9 @@ class OllamaClient():
     
     def setServer(self,server, port):
         self.client = Client(host=f'http://{server}:{port}')
+
+    def embed(self, model: str, input: str | list[str]):
+        return self.client.embed(model=model, input=input)
     
     def clear_history(self):
         self.messages.clear()

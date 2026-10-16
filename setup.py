@@ -21,7 +21,7 @@ setup(
     author="Viswa Kumar",
     author_email="kspviswaphd@gmail.com",
     license="MIT",
-    scripts=['bin/lpw', 'bin/lpw_main.py', 'bin/lpw_ollamaClient.py', 'bin/lpw_packet.py', 'bin/lpw_prompt.py', 'bin/lpw_settings.py', 'bin/lpw_home.py', 'bin/lpw_init.py', 'bin/lpw_agent.py'],
+    scripts=['bin/lpw', 'bin/lpw_main.py', 'bin/lpw_ollamaClient.py', 'bin/lpw_packet.py', 'bin/lpw_prompt.py', 'bin/lpw_settings.py', 'bin/lpw_home.py', 'bin/lpw_init.py', 'bin/lpw_agent.py', 'bin/lpw_rag.py'],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
