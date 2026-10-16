@@ -1,6 +1,8 @@
 import streamlit as st
 from copy import deepcopy
+import logging
 import os
+from pathlib import Path
 
 DEFAULT_SYSTEM_MESSAGE = """
         You are a helper assistant specialized in analysing packet captures used to troubleshooting & technical analysis. Use the information present in packet_capture_info to answer all the questions truthfully. If the user asks about a specific application layer protocol, use the following hints to inspect the packet_capture_info to answer the question.
@@ -87,3 +89,21 @@ def getLpwPath(dirname):
     if not os.path.exists(dirname_path):
         os.makedirs(dirname_path)
     return dirname_path
+
+def log_message(message: str) -> None:
+  log_file = Path.home() / "pakkehvisker" / "log" / "pakkehvisker.log"
+  log_file.parent.mkdir(parents=True, exist_ok=True)
+
+  logger = logging.getLogger("pakkehvisker")
+  logger.setLevel(logging.INFO)
+  logger.propagate = False
+  if not any(
+    isinstance(handler, logging.FileHandler)
+    and Path(handler.baseFilename) == log_file
+    for handler in logger.handlers
+  ):
+    handler = logging.FileHandler(log_file, encoding="utf-8")
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    logger.addHandler(handler)
+
+  logger.info("%s", message)

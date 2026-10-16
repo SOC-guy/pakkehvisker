@@ -22,7 +22,7 @@ class LPWCrew:
             agents = [self.sne_agent],
             tasks = [self.caTask]
         )
-        print('#### Crew initialized')
+        log_message("Crew initialized")
     
     def kickoff(self, data, protocol) -> str:
         result = self.crew.kickoff(inputs={'pcap_data' : data, 'protocol' : protocol})
@@ -37,7 +37,7 @@ class LPWCrew:
             llm=self.llm,
             #verbose=True
         )
-        print(f"##### {getLpwPath('temp')}/insights.md")
+        log_message(f"Agent configuration loaded; temp directory: {getLpwPath('temp')}")
         self.caTask = Task(
             description=agent_data['tasks'][0]['description'],
             expected_output=agent_data['tasks'][0]['expected_output'],
