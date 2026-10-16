@@ -167,7 +167,7 @@ with col1:
     st.markdown('`Your local network assistant!`')
     st.markdown(f'`Version : {get_lpw_version()}`')
 with col2:
-    st.image(image=lpw_avatar, use_container_width=True)
+    st.image(image=lpw_avatar, width='stretch')
 
 
 
@@ -213,7 +213,7 @@ else :
                             message_placeholder.markdown(full_response, unsafe_allow_html=True)
                         else:
                             st.markdown(full_response)
-                st.button('Reset Chat 🗑️', use_container_width=True, on_click=resetChat)
+                st.button('Reset Chat 🗑️', width='stretch', on_click=resetChat)
     with insights:
         show_beta_ribbon()
         glowing_header_text('Agentic Insights', 'Available for 5G NGAP only')
@@ -226,7 +226,7 @@ else :
         else:
             if not returnValue('insights_done'):
                 st.markdown('Packet Capture Processed. Click below to generate insights')
-                if st.button(label='Generate Insights 🫰🏻', type='primary', use_container_width=True):
+                if st.button(label='Generate Insights 🫰🏻', type='primary', width='stretch'):
                     st.session_state['insights_done'] = True
                     st.session_state['insights_file_done'] = False
                     st.rerun()
@@ -245,4 +245,4 @@ else :
                     st.download_button(label='Download Insights markdown',
                                         data = returnValue('insights_raw'),
                                         type='primary',
-                                        use_container_width=True)
+                                        width='stretch')
