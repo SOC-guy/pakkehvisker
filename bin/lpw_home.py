@@ -160,6 +160,14 @@ with st.sidebar:
             #os.remove(f'{packetFile.name}')
     else:
         st.session_state['pcap_fname'] = "None 🚫"
+    if packetFile:
+        decoded_text = returnValue('pcap_data')
+        sent_chars = min(len(decoded_text), MAX_PCAP_CONTEXT_CHARS)
+        st.metric("Decoded packet text", f"{len(decoded_text):,} characters")
+        st.caption(
+            f"Chat includes {sent_chars:,} of {len(decoded_text):,} characters "
+            f"(cap: {MAX_PCAP_CONTEXT_CHARS:,}; omitted: {len(decoded_text) - sent_chars:,})."
+        )
 
 col1, col2 = st.columns([2,1])
 with col1:
