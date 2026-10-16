@@ -2,6 +2,8 @@ import streamlit as st
 import ollama
 from ollama import Client
 
+MAX_HISTORY_MESSAGES = 8
+
 class OllamaClient():
 
     def __init__(self, server="127.0.0.1"):
@@ -47,11 +49,20 @@ class OllamaClient():
         message['role'] = 'user'
         message['content'] = prompt
         self.messages.append(message)
+        system_messages = self.messages[:1] if self.check_system_message() else []
+        self.messages = system_messages + self.messages[len(system_messages):][-MAX_HISTORY_MESSAGES:]
         response = None
         try:
             response = self.client.chat(model=model, messages=self.messages, options=options)
         except Exception as e:
-            st.error(f'Error Occured : {e} ', icon="🚨")
+            if "tokenize" in str(e).lower():
+                st.error(
+                    "Ollama could not tokenize this request. LPW limits capture context and chat history; "
+                    "try a smaller capture or a display filter, then check the selected model and Ollama server logs.",
+                    icon="🚨",
+                )
+            else:
+                st.error(f'Error Occured : {e} ', icon="🚨")
             st.stop()
         self.messages.append(response['message'])
         return response['message']['content']

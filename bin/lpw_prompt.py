@@ -2,7 +2,12 @@ import streamlit as st
 from lpw_ollamaClient import OllamaClient
 from lpw_init import returnValue
 
+MAX_PCAP_CONTEXT_CHARS = 8000
+
 def returnSystemText(pcap_data : str) -> str:
+    if len(pcap_data) > MAX_PCAP_CONTEXT_CHARS:
+        pcap_data = pcap_data[:MAX_PCAP_CONTEXT_CHARS]
+        st.warning(f"Capture context was limited to {MAX_PCAP_CONTEXT_CHARS:,} characters to fit the model context.")
     PACKET_WHISPERER = f"""
         {returnValue('system_message')}
         packet_capture_info : {pcap_data}
