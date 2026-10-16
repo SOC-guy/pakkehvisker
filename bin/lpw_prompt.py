@@ -2,7 +2,7 @@ import streamlit as st
 from lpw_ollamaClient import OllamaClient
 from lpw_init import returnValue
 
-MAX_PCAP_CONTEXT_CHARS = 8000
+MAX_PCAP_CONTEXT_CHARS = 32000
 
 def returnSystemText(pcap_data : str) -> str:
     if len(pcap_data) > MAX_PCAP_CONTEXT_CHARS:
