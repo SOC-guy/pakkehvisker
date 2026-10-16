@@ -2,7 +2,7 @@ import streamlit as st
 from lpw_init import *
 from lpw_prompt import *
 from lpw_packet import *
-from lpw_agent import LPWCrew
+from lpw_agent import CREWAI_AVAILABLE, LPWCrew
 import os
 import time
 from streamlit_extras.tags import tagger_component
@@ -218,7 +218,9 @@ else :
         show_beta_ribbon()
         glowing_header_text('Agentic Insights', 'Available for 5G NGAP only')
         st.markdown('`Get a comprehensive report on PCAPs. Powered by LPW Agents!`')
-        if st.session_state['pcap_fname'] == "None 🚫":
+        if not CREWAI_AVAILABLE:
+            st.info('Agentic Insights require CrewAI, which is not available for this Python version. Use Python 3.13 or earlier to enable this feature.')
+        elif st.session_state['pcap_fname'] == "None 🚫":
             st.markdown('#### Waiting for packets 🧘🏻🧘🏻🧘🏻🧘🏻')
             st.session_state['insights_done'] = False
         else:

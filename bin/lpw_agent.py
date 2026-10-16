@@ -1,10 +1,18 @@
 import streamlit as st
 from lpw_init import *
-from crewai import Agent, Task, Crew, LLM
 import yaml
+
+try:
+    from crewai import Agent, Task, Crew, LLM
+except ImportError:
+    Agent = Task = Crew = LLM = None
+
+CREWAI_AVAILABLE = Agent is not None
 
 class LPWCrew:
     def __init__(self, llm_host="127.0.0.1", llm_port="11434", model="llama3.1:latest"):
+        if not CREWAI_AVAILABLE:
+            raise RuntimeError("CrewAI is unavailable for this Python version. Use Python 3.13 or earlier for Agentic Insights.")
         self.llm_host = llm_host
         self.llm_port = llm_port
         self.model = model

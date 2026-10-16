@@ -115,6 +115,8 @@ python3 -m pip install .
 lpw start --host 0.0.0.0 --port 8501
 ```
 
+The main packet chat can run on Python 3.14, but Agentic Insights currently depends on CrewAI, which supports Python only through 3.13. CrewAI is therefore skipped on Python 3.14 and Insights is disabled; use Python 3.13 to enable it.
+
 Open `http://<WSL-host-or-IP>:8501` from the browser host. WSL2 localhost forwarding usually allows access from Windows on the same machine; access from other LAN hosts may require WSL/Windows firewall rules or port forwarding. The GUI has no built-in authentication, so do not expose this port to an untrusted network. Use `lpw stop` to stop the server.
 
 To build a wheel in WSL, run `./build.sh` from an activated Python virtual environment.
