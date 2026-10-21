@@ -51,7 +51,7 @@ ollama pull dolphin-mistral:latest
 ollama pull nomic-embed-text
 ```
 
-LPW embeds packet chunks with `nomic-embed-text` and stores its local ChromaDB vector index under `~/.lpw/index`. Set another Ollama embedding model in LPW Settings if desired. Each question retrieves the five closest chunks before sending them with the prompt to the selected chat model.
+LPW embeds packet chunks with `nomic-embed-text` and stores its local ChromaDB vector index under `~/.lpw/index`. Set another Ollama embedding model in LPW Settings if desired. Each question retrieves all chunks in the capture, ordered by relevance, before sending them with the prompt to the selected chat model. Very large captures may exceed the selected chat model's context window.
 
 3) If not running the desktop application, Start Ollama Server (refer [here](https://github.com/ollama/ollama?tab=readme-ov-file#start-ollama))
 4) You also need to install `tshark` executable. You could either install the [Wireshark Application](https://www.wireshark.org/download.html) or simply use `brew install tshark`.

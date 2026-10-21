@@ -280,7 +280,6 @@ else :
                             query="Summarize the capture's protocols, endpoints, conversations, anomalies, and notable events.",
                             embedding_model=returnValue('embedding_model'),
                             ollama_client=getOllamaClient(),
-                            top_k=12,
                         )
                         st.session_state['insights_raw'] = LPWCrew(
                             llm_host=returnValue('llm_server'),

@@ -60,8 +60,8 @@ class OllamaClient():
         except Exception as e:
             if "tokenize" in str(e).lower():
                 st.error(
-                    "Ollama could not tokenize this request. LPW limits capture context and chat history; "
-                    "try a smaller capture or a display filter, then check the selected model and Ollama server logs.",
+                    "Ollama could not tokenize this request. The selected model's context window may be too small; "
+                    "try a smaller capture or a display filter, or select a model with a larger context window.",
                     icon="🚨",
                 )
             else:

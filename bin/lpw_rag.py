@@ -6,7 +6,6 @@ from lpw_init import getLpwPath, log_message
 
 MAX_CHUNK_CHARS = 2400
 EMBED_BATCH_SIZE = 32
-RETRIEVAL_TOP_K = 5
 
 
 def chunk_packets(
@@ -145,7 +144,6 @@ def index_capture(
         flush_batch()
         collection.modify(
             metadata={
-                "hnsw:space": "cosine",
                 "embedding_model": embedding_model,
                 "status": "ready",
                 "packet_count": packet_count,
@@ -174,10 +172,10 @@ def search_capture(
     query: str,
     embedding_model: str,
     ollama_client: Any,
-    top_k: int = RETRIEVAL_TOP_K,
+    top_k: int | None = None,
 ) -> list[dict[str, Any]]:
     collection = _get_database().get_collection(name=capture_id)
-    result_count = min(top_k, collection.count())
+    result_count = collection.count() if top_k is None else min(top_k, collection.count())
     if result_count == 0:
         return []
 
