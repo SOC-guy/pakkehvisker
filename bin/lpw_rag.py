@@ -1,3 +1,4 @@
+import atexit
 from collections.abc import Iterable, Iterator
 from hashlib import sha256
 from typing import Any
@@ -6,6 +7,7 @@ from lpw_init import getLpwPath, log_message
 
 MAX_CHUNK_CHARS = 2400
 EMBED_BATCH_SIZE = 32
+_cleanup_registered = False
 
 
 def chunk_packets(
@@ -58,6 +60,25 @@ def _get_database() -> Any:
     import chromadb
 
     return chromadb.PersistentClient(path=getLpwPath("index"))
+
+
+def cleanup_rag_database() -> None:
+    database = _get_database()
+    collections = database.list_collections()
+    for collection in collections:
+        collection_name = getattr(collection, "name", collection)
+        database.delete_collection(name=collection_name)
+    log_message(f"Cleaned up RAG database ({len(collections)} collections)")
+
+
+def register_rag_cleanup() -> None:
+    global _cleanup_registered
+    if _cleanup_registered:
+        return
+
+    cleanup_rag_database()
+    atexit.register(cleanup_rag_database)
+    _cleanup_registered = True
 
 
 def index_capture(
